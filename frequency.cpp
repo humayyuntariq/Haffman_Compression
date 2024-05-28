@@ -12,27 +12,23 @@ void frequencies(string text, char words[], int freq[], int &char_count)
 
     for (int i=0; i<text.length(); i++)//loop will continue until the end of text
     {
-        present = false;
+        present = false;        //this bool variable will be true when it found this alphabet is already present in array
 
-        for (int m=0; m<char_count; m++)
+        for (int m=0; m<char_count; m++) //loop will continnue until the number of character peresnt in array
         {
-            if (text[i] == words[m])
+            if (text[i] == words[m]) //if the character form text matches with character in array
             {
-                present = true;
-                freq_loca = m;
-                break;
+                present = true; 
+                freq[m] += 1;      //increment the frequency where we found the duplicate
+                break;              //duplicate found and increment in frequeney then break the loop
             }
         }
-            if (present)
+            if (!present)           //if character not found
             {
-                freq[freq_loca] += 1;
-            }
-            else 
-            {
-                words[char_count] = text[i];
+                words[char_count] = text[i];        //store the text character into the words
                 //cout<<words[char_count];
-                freq[char_count] += 1;
-                char_count +=1;
+                freq[char_count] += 1;          //increment the frequency form 0 to 1
+                char_count +=1;                //also increment the number of character
             }
         
     }
