@@ -7,3 +7,6 @@
     string text = buffer_holder.str(); //coverting and storing that content into string
     textfile.close();//closing the file
     cout<<text<<endl;
+
+    text.length() will return total numbers of character in text, including line breaker and null characrer and space
+    
