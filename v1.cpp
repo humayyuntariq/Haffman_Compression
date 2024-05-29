@@ -13,11 +13,42 @@ class node
         int freq;
         node *left, *right;
     
-    node (char chartr=0, int fre=0)
+    node (char chartr='\0', int fre=0)
     {
         ch=chartr; freq= fre;  left= nullptr; right = nullptr;
     }
 };
+struct Compare_node
+{
+    bool operator()(node* const& node01, node* const& node02)
+    {
+        return node01->freq > node02->freq; //min heap property (for storing acesingdly)
+    }
+};
+
+node* build_haffman(priority_queue<node*, vector<node*>, Compare_node>& pq1) {
+    while(pq1.size()>1)
+    {
+        
+        node *ptr2 = pq1.top();
+        cout << "Character: " << ptr2->ch << ", Frequency: " << ptr2->freq << std::endl;
+
+        pq1.pop();
+        node *ptr3 = pq1.top(); 
+        cout << "Character: " << ptr3->ch << ", Frequency: " << ptr3->freq << std::endl;
+
+
+        pq1.pop();
+        node *ptr1= new node('@',(ptr2->freq) + (ptr3->freq));
+        
+        ptr1->left = ptr2;
+        ptr1->right = ptr3;
+
+        pq1.push(ptr1);
+    }
+    // The remaining node is the root of the Huffman tree
+    return pq1.top();
+}
 
 void frequencies(string text, char words[], int freq[], int &char_count)
 {
@@ -50,13 +81,17 @@ void frequencies(string text, char words[], int freq[], int &char_count)
 
 }
 
-struct Compare_node
+
+
+void printing (node* root)
 {
-    bool operator()(node* const& node01, node* const& node02)
+    if (root!=nullptr)
     {
-        return node01->freq > node02->freq; //min heap property (for storing acesingdly)
+        cout<<root->ch<<" ";
+        printing(root->left);
+        printing(root->right);
     }
-};
+}
 
 int main()
 {
@@ -100,6 +135,12 @@ int main()
 
         cout << "Character: " << minNode->ch << ", Frequency: " << minNode->freq << std::endl;
 
-        delete minNode; // Clean up
     }
+
+    // node* root = build_haffman(pq1);
+    // pq1.pop();
+
+    // printing(root);
+    // cout<<endl;
+    
 }
