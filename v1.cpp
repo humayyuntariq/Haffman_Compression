@@ -120,36 +120,49 @@ void printing (node* root)
         printing(root->right);
     }
 }
-void writebinary(int size, int alpha_size, string text, char alpha[], string binar_Code[])
+void writebinary(int size, int alpha_size, string text, char alpha[], string binar_Code[], int &totalbits)
 {
-    int index;
-    char byte;
+   int index;
     string character;
-    //open file
+    unsigned char byte = 0;  // This will hold 8 bits at a time
+    int bit_count = 0;       // To keep track of the number of bits in the current byte
+
+    // Open file
     ofstream myfile("compressed.bin", ios::binary);
     if (!myfile.is_open()) {
-        cout << "Error opening file!" <<endl;
+        cout << "Error opening file!" << endl;
         return;
     }
 
-    for (int i=0; i<size;i++)
-    {
-        for (int m=0; m<alpha_size; m++)
-        {
-            if (text[i]==alpha[m])
-            {
+    for (int i = 0; i < size; i++) {
+        for (int m = 0; m < alpha_size; m++) {
+            if (text[i] == alpha[m]) {
                 index = m;
                 break;
             }
         }
 
         character = binar_Code[index];
-        for (int s=0; s<character.length(); s++)
-        {
-            byte =character[s];
-            myfile.write(&byte, sizeof(byte));
+        totalbits += binar_Code[index].length();
+        for (char bit : character) {
+            if (bit == '1') {
+                byte |= (1 << (7 - bit_count));  // Set the appropriate bit in byte
+            }
+            bit_count++;
+
+            if (bit_count == 8) {  // If we have accumulated 8 bits, write the byte to the file
+                myfile.write(reinterpret_cast<const char*>(&byte), sizeof(byte));
+                byte = 0;  // Reset byte
+                bit_count = 0;  // Reset bit counter
+            }
         }
     }
+
+    // Write the remaining bits if any
+    if (bit_count > 0) {
+        myfile.write(reinterpret_cast<const char*>(&byte), sizeof(byte));
+    }
+
     myfile.close();
 }
 
@@ -158,6 +171,7 @@ int main()
     char alphabets[97];
     int freq [97] = {0};
     int char_count=0;
+    int totalbits= 0;
 
     ifstream textfile;   //creating object of the fstream object
 
@@ -204,16 +218,26 @@ int main()
     pq1.pop();
       printing(root);
    findbinary(char_count, root, alphabets, BinaryData);
-    writebinary(text.length(), char_count,text, alphabets, BinaryData);
-
+    writebinary(text.length(), char_count,text, alphabets, BinaryData, totalbits);
 
     ifstream myfile02("compressed.bin", ios::binary);
 char byte;
+    string bitString;
+
     while (myfile02.get(byte)) {
-        cout<<byte;
+        for (int i = 7; i >= 0; --i) {
+            if (bitString.size() < totalbits) {
+                if (byte & (1 << i)) {
+                    bitString += '1';
+                } else {
+                    bitString += '0';
+                }
+            }
+        }
     }
 
     myfile02.close();
+     cout << bitString << endl;
 //printing binary code
 //    for (int i=0; i<char_count; i++)
 //     {
